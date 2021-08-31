@@ -1,0 +1,47 @@
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+ul,li,ol{
+  list-style: none;
+}
+/* 滚动条优化 start */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f6f6f6;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cdcdcd;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #747474;
+}
+
+::-webkit-scrollbar-corner {
+  background: #f6f6f6;
+}
+/* 滚动条优化 end */
+.el-header{
+  padding: 0 !important;
+}
+.el-footer{
+  padding: 0 !important;
+}
+.mod-home{
+  overflow: hidden;
+}
+.site-content,.site-content,.el-main{
+  padding: 0 !important;
+}

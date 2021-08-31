@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.rna.dao.RnaInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.rna.entity.RnaInfoEntity" id="rnaInfoMap">
+        <result property="dataId" column="data_id"/>
+        <result property="pmid" column="pmid"/>
+        <result property="tilte" column="tilte"/>
+        <result property="journal" column="journal"/>
+        <result property="pubTime" column="pub_time"/>
+        <result property="organism" column="organism"/>
+        <result property="tissueOrigin" column="tissue_origin"/>
+        <result property="cancerType" column="cancer_type"/>
+        <result property="cancerTypeAd" column="cancer_type_ad"/>
+        <result property="geneId" column="gene_id"/>
+        <result property="geneSymbol" column="gene_symbol"/>
+        <result property="databaseId" column="database_id"/>
+        <result property="geneType" column="gene_type"/>
+        <result property="geneExpPattern" column="gene_exp_pattern"/>
+        <result property="suvival" column="suvival"/>
+        <result property="majorTargets" column="major_targets"/>
+        <result property="targetGene" column="target_gene"/>
+        <result property="downstreamEffect" column="downstream_effect"/>
+        <result property="downstreamEffectEvidence" column="downstream_effect_evidence"/>
+        <result property="downstreamEffectMethod" column="downstream_effect_method"/>
+        <result property="function" column="function"/>
+        <result property="funtionEvidence" column="funtion_evidence"/>
+        <result property="functionMethod" column="function_method"/>
+        <result property="immuneCell" column="immune_cell"/>
+        <result property="immunePathway" column="immune_pathway"/>
+        <result property="immuneActivity" column="immune_activity"/>
+        <result property="evidenceCode" column="evidence_code"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+
+</mapper>
