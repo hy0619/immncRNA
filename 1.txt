@@ -1,0 +1,22 @@
+1.首页图片
+2.fotter  内容
+3.  内容介绍  两张对其
+
+
+cancer type   ：包括 cancer type  + cancer type ad 搜索
+gene type
+tissue origin
+
+immune cell 
+
+
+serche 分页bug
+
+
+brower ： tissue origin+ pub_time  cancer_type : 包括 cancer type  + cancer type ad 搜索    
+	gene type    survival  immune cell
+
+
+
+
+
