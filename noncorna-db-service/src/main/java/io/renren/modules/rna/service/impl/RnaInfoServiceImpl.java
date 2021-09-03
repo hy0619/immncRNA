@@ -72,6 +72,8 @@ public class RnaInfoServiceImpl extends ServiceImpl<RnaInfoDao, RnaInfoEntity> i
                         .or().like("immune_cell" ,  keyWords)
                         .or().like("immune_pathway" ,  keyWords)
                         .or().like("gene_id" ,  keyWords)
+                        .or().like("major_targets" ,  keyWords)
+                        .or().like("tissue_origin" ,  keyWords)
                         .or().like("gene_symbol" ,  keyWords));
 
         IPage<RnaInfoEntity> page = this.page(

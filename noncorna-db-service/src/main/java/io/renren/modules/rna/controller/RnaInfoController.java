@@ -13,8 +13,9 @@ import io.renren.common.exception.RRException;
 import io.renren.common.utils.ExcelUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.common.utils.StringUtil;
 import io.renren.modules.rna.entity.RnaCategoryEntity;
-import io.renren.modules.rna.entity.RnaInfoCateGoryTree;
+import io.renren.modules.rna.entity.RnaInfoCategoryZTree;
 import io.renren.modules.rna.entity.RnaInfoEntity;
 import io.renren.modules.rna.service.RnaInfoService;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -46,7 +47,6 @@ public class RnaInfoController {
      * 列表
      */
     @RequestMapping("/web/list")
-    //@RequiresPermissions("rna:rnainfo:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = rnaInfoService.queryPage(params);
         return R.ok().put("page", page);
@@ -178,55 +178,81 @@ public class RnaInfoController {
 
     @GetMapping("/web/infoTree/{category}")
     public R getTreeByCatagory(@PathVariable String category ){
-        List<RnaInfoCateGoryTree> children = new ArrayList<>();
-        if(category.equals("gen")){
-            RnaInfoCateGoryTree genIdNode = genColumnNode("gene_id" , "gen");
-            RnaInfoCateGoryTree geneSymbolNode = genColumnNode("gene_symbol" , "gen");
-            children.add(genIdNode);
-            children.add(geneSymbolNode);
-        }else if(category.equals("cancer")) {
-            RnaInfoCateGoryTree cancerTypeNode = genColumnNode("cancer_type" , "cancer");
-            RnaInfoCateGoryTree cancerTypeAdNode = genColumnNode("cancer_type_ad" , "cancer");
-            children.add(cancerTypeNode);
-            children.add(cancerTypeAdNode);
+        List tree = new LinkedList<>();
+        String pid = "-1";
 
-        } else if(category.equals("immunePathway")) {
-            RnaInfoCateGoryTree immunePathwayNode = genColumnNode("immune_pathway" , "immunePathway");
-            children.add(immunePathwayNode);
-        }else if(category.equals("immuneCell")) {
-            RnaInfoCateGoryTree immuneCellNode = genColumnNode("immune_cell" , "immuneCell");
-            children.add(immuneCellNode);
+      if(category.equals("gen")){
+            List<RnaInfoCategoryZTree> genTypeNode = genColumnNode("gene_type", "gen" , pid);
+            tree.addAll(genTypeNode);
+
+          /*List<RnaInfoCategoryZTree> genTypeAdNode = genColumnNode("gene_type_ad", "gen" , pid);
+          tree.addAll(genTypeAdNode);*/
+
+        }else if(category.equals("cancer")) {
+            List<RnaInfoCategoryZTree> cancerTypeNode = genColumnNode("cancer_type" , "cancer" , pid);
+            List<RnaInfoCategoryZTree> cancerTypeAdNode = genColumnNode("cancer_type_ad" , "cancer" , pid);
+            tree.addAll(cancerTypeNode);
+            tree.addAll(cancerTypeAdNode);
+
+        } /*else if(category.equals("immunePathway")) {
+            List<RnaInfoCategoryZTree> immunePathwayNode =
+                    genColumnNode("immune_pathway" , "immunePathway" , pid);
+            tree.addAll(immunePathwayNode);
+        }*/else if(category.equals("immuneCell")) {
+            List<RnaInfoCategoryZTree> immuneCellNode = genColumnNode("immune_cell"
+                    , "immuneCell" , pid);
+            tree.addAll(immuneCellNode);
+        }else if(category.equals("suvival")){
+          List<RnaInfoCategoryZTree> tissueOriginNode = genColumnNode("suvival"
+                  , "tissueOrigin" , pid);
+          tree.addAll(tissueOriginNode);
+
+        }else if(category.equals("pubTime")){
+          List<RnaInfoCategoryZTree> pubTimeNode = genColumnNode("pub_time"
+                  , "pubTime" , pid);
+          tree.addAll(pubTimeNode);
+
+        }else if(category.equals("tissueOrigin")){
+          List<RnaInfoCategoryZTree> tissueOriginNode = genColumnNode("tissue_origin"
+                  , "tissueOrigin" , pid);
+          tree.addAll(tissueOriginNode);
         }
-        if(CollectionUtils.isEmpty(children)) children = null;
-        return R.ok().put("tree" , children);
+
+        return R.ok().put("tree" , tree);
     }
 
 
-    private  RnaInfoCateGoryTree genColumnNode(String columnName  , String category){
-        RnaInfoCateGoryTree node = new RnaInfoCateGoryTree()
-                .setId(UUID.randomUUID().toString())
+    private  List<RnaInfoCategoryZTree> genColumnNode(String columnName  , String category , String pid){
+        List<RnaInfoCategoryZTree> resList = new LinkedList<>();
+        String id = UUID.randomUUID().toString();
+        String str = StringUtil.replaceUnderlineAndfirstToUpper(columnName, "_", " ");
+        String name = StringUtil.firstCharacterToUpper(str);
+        RnaInfoCategoryZTree node = new RnaInfoCategoryZTree()
+                .setId(id)
+                .setPid(pid)
                 .setCategory(category)
-                .setLabel(columnName.toUpperCase());
+                .setName(name);
+        resList.add(node);
         QueryWrapper<RnaInfoEntity> wrapper =
-                new QueryWrapper<RnaInfoEntity>().eq("status" , 0).select("distinct " + columnName);
+                new QueryWrapper<RnaInfoEntity>()
+                        .orderByDesc(columnName)
+                        .isNotNull(columnName)
+                        .eq("status" , 0).select("distinct " + columnName);
         List<RnaInfoEntity> list = rnaInfoService.list(wrapper);
-        List<RnaInfoCateGoryTree> children = new ArrayList<>();
         if(!CollectionUtils.isEmpty(list)){
             for(RnaInfoEntity rnaInfoEntity : list){
-                RnaInfoCateGoryTree rnaInfoCateGoryTree = new RnaInfoCateGoryTree();
-                String labLower = (String)ReflectUtil.getFieldValue(rnaInfoEntity,
+                RnaInfoCategoryZTree rnaInfoCateGoryTree = new RnaInfoCategoryZTree();
+                String labLower = (String) ReflectUtil.getFieldValue(rnaInfoEntity,
                         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, columnName));
 
-                rnaInfoCateGoryTree.setId(UUID.randomUUID().toString()).setCategory(category)
-                        .setLabel(StringUtils.isEmpty(labLower)? "" : labLower.toUpperCase())
-                        .setChildren(null);
-
-
-                children.add(rnaInfoCateGoryTree);
+                rnaInfoCateGoryTree.setId(rnaInfoEntity.getDataId() + "")
+                        .setPid(id)
+                        .setCategory(category)
+                        .setName(labLower);
+                resList.add(rnaInfoCateGoryTree);
             }
         }
-        if(!CollectionUtils.isEmpty(children)) node.setChildren(children);
-        return node;
+        return resList;
     }
 
 

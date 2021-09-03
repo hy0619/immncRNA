@@ -4,23 +4,30 @@
     <div class="downBan"></div>
     <div class="browseCnt">
       <el-tabs v-model="activeName"  @tab-click="handleClick" type="border-card">
-        <el-tab-pane label="CANCER" name="cancer">
+        <el-tab-pane label="Tissue Origin" name="tissueOrigin">
+          <browse-table catagory="tissueOrigin" ></browse-table>
+        </el-tab-pane>
+          <el-tab-pane label="Pub Time" name="pubTime">
+          <browse-table catagory="pubTime" ></browse-table>
+        </el-tab-pane>
+        <el-tab-pane label="Cancer" name="cancer">
           <browse-table catagory="cancer" ></browse-table>
         </el-tab-pane>
-        <el-tab-pane label="GEN" name="gen">
+        <el-tab-pane label="Gene" name="gen">
           <browse-table catagory="gen"></browse-table>
         </el-tab-pane>
-        <el-tab-pane label="IMMUNE CELL" name="immuneCell">
+        <!-- <el-tab-pane label="Immune Cell" name="immuneCell">
           <browse-table catagory="immuneCell"></browse-table>
+        </el-tab-pane> -->
+        <el-tab-pane label="Suvival" name="suvival">
+          <browse-table  catagory="suvival"></browse-table>
         </el-tab-pane>
-        <el-tab-pane label="IMMUNE PATHWAY" name="immunePathway">
-          <browse-table v-loading ="loading" catagory="immunePathway"></browse-table>
-        </el-tab-pane>
+       
       </el-tabs>
     </div>
 
   </div>
-</template>
+</template>x
 
 <script>
 import BrowseTable from './browseTable'
@@ -49,7 +56,7 @@ export default {
   background: url("~@/assets/img/nyban.jpg") center no-repeat;
 }
 .browseCnt{
-  width: 1200px;
+  width: 1500px;
   margin: 25px auto 0 auto;
 }
 </style>

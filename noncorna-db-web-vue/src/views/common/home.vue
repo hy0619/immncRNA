@@ -37,20 +37,8 @@
         <div class="statisticsMain">
           <div class="quickTil">Statistics</div>
           <div>
-            <div class="statistBox2 statistBox">
-              <p>GENE ID:</p>
-              <span>32677</span>
-            </div>
-            <div class="statistBox3 statistBox">
-              <p>CANCER TYPE:</p>
-              <span>71</span>
-            </div>
-
-            <div class="statistBox1 statistBox">
-              <p>IMMUNE CELL:</p>
-              <span>92</span>
-            </div>
-           <!-- <div class="statistBox2 statistBox">
+            
+           <div class="statistBox2 statistBox">
               <p>GENE ID:</p>
               <span>{{ genCnt }}</span>
             </div>
@@ -62,7 +50,7 @@
             <div class="statistBox1 statistBox">
               <p>IMMUNE CELL:</p>
               <span>{{ immuneCellCnt }}</span>
-            </div>-->
+            </div>
           </div>
         </div>
         <!--    news    -->
