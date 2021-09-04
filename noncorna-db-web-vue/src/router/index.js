@@ -77,7 +77,6 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-
 /**
  * 判断当前路由类型, global: 全局路由, main: 主入口路由
  * @param {*} route 当前路由

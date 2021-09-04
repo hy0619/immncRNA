@@ -37,20 +37,8 @@
         <div class="statisticsMain">
           <div class="quickTil">Statistics</div>
           <div>
-            <div class="statistBox2 statistBox">
-              <p>GENE ID:</p>
-              <span>32677</span>
-            </div>
-            <div class="statistBox3 statistBox">
-              <p>CANCER TYPE:</p>
-              <span>71</span>
-            </div>
 
-            <div class="statistBox1 statistBox">
-              <p>IMMUNE CELL:</p>
-              <span>92</span>
-            </div>
-           <!-- <div class="statistBox2 statistBox">
+           <div class="statistBox2 statistBox">
               <p>GENE ID:</p>
               <span>{{ genCnt }}</span>
             </div>
@@ -62,25 +50,28 @@
             <div class="statistBox1 statistBox">
               <p>IMMUNE CELL:</p>
               <span>{{ immuneCellCnt }}</span>
-            </div>-->
+            </div>
           </div>
         </div>
         <!--    news    -->
         <div class="newsMain">
-          <div class="newsTil">
+          <div>
+            <div id="svgTemplate"></div>
+          </div>
+         <!-- <div class="newsTil">
             Latest News
           </div>
           <div class="newsCnt">
             <ul class="newsList">
               <li v-for = "news in topNews">
-                <!--:href="news.linkUrl"-->
+                &lt;!&ndash;:href="news.linkUrl"&ndash;&gt;
                 <a target="_blank" >
                   <p>{{ news.title }}</p>
                   <span>{{ news.ct }}</span>
                 </a>
               </li>
             </ul>
-          </div>
+          </div>-->
         </div>
         <!--    searcher    -->
         <div class="quickSerMain">
@@ -98,195 +89,235 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        keywords: '',
-        width: 384,
-        height: 354,
-        tagsNum: 20,
-        RADIUS: 130,
-        speedX: Math.PI / 360,
-        speedY: Math.PI / 360,
-        tags: [],
-        webconfig: {},
-        topNews: [],
-        immuneCellCnt: 0,
-        genCnt: 0,
-        cancerTypeCnt: 0
+import Vue from 'vue/dist/vue.esm.js'
 
-      }
+export default {
+  data () {
+    return {
+      keywords: '',
+      width: 384,
+      height: 354,
+      tagsNum: 20,
+      RADIUS: 130,
+      speedX: Math.PI / 360,
+      speedY: Math.PI / 360,
+      tags: [],
+      webconfig: {},
+      topNews: [],
+      immuneCellCnt: 0,
+      genCnt: 0,
+      cancerTypeCnt: 0
+
+    }
+  },
+  computed: {
+    CX () {
+      return this.width / 3
     },
-    computed: {
-      CX () {
-        return this.width / 3
-      },
-      CY () {
-        return this.height / 2
-      }
-    },
-    created: function () {
-      var _this = this
-      document.onkeydown = function (e) {   // 按下回车提交
-        let key = window.event.keyCode
+    CY () {
+      return this.height / 2
+    }
+  },
+  created: function () {
+    var _this = this
+    document.onkeydown = function (e) {   // 按下回车提交
+      let key = window.event.keyCode
         // eslint-disable-next-line eqeqeq
-        if (key == 13) {
-          _this.search()
-        }
-      }
-    },
-    /* created: function () {
-      let tags = []
-      for (let i = 0; i < this.tagsNum; i++) {
-        let tag = {}
-        let k = -1 + (2 * (i + 1) - 1) / this.tagsNum
-        let a = Math.acos(k)
-        let b = a * Math.sqrt(this.tagsNum * Math.PI)
-        tag.text = i + 'tag'
-        tag.x = this.CX + this.RADIUS * Math.sin(a) * Math.cos(b)
-        tag.y = this.CY + this.RADIUS * Math.sin(a) * Math.sin(b)
-        tag.z = this.RADIUS * Math.cos(a)
-        tag.href = 'https://imgss.github.io'
-        tags.push(tag)
-      }
-
-      this.tags = tags
-    }, */
-    mounted () { // 使球开始旋转
-      setInterval(() => {
-        this.rotateX(this.speedX)
-        this.rotateY(this.speedY)
-      }, 30)
-    },
-    activated () {
-      this.getWebConfig()
-      this.getTopNews()
-      this.getStatisticsBaseInfo()
-      this.getTags()
-    },
-    methods: {
-      rotateX (speedX) {
-        var cos = Math.cos(speedX)
-        var sin = Math.sin(speedX)
-        for (let tag of this.tags) {
-          var y1 = (tag.y - this.CY) * cos - tag.z * sin + this.CY
-          var z1 = tag.z * cos + (tag.y - this.CY) * sin
-          tag.y = y1
-          tag.z = z1
-        }
-      },
-      rotateY (speedY) {
-        var cos = Math.cos(speedY)
-        var sin = Math.sin(speedY)
-        for (let tag of this.tags) {
-          var x1 = (tag.x - this.CX) * cos - tag.z * sin + this.CX
-          var z1 = tag.z * cos + (tag.x - this.CX) * sin
-          tag.x = x1
-          tag.z = z1
-        }
-      },
-      listener (event) { // 响应鼠标移动
-        var x = event.clientX - this.CX
-        var y = event.clientY - this.CY
-        this.speedX = x * 0.0001 > 0 ? Math.min(this.RADIUS * 0.00002, x * 0.0001) : Math.max(-this.RADIUS * 0.00002, x * 0.0001)
-        this.speedY = y * 0.0001 > 0 ? Math.min(this.RADIUS * 0.00002, y * 0.0001) : Math.max(-this.RADIUS * 0.00002, y * 0.0001)
-      },
-      getWebConfig () {
-        this.$http({
-          url: this.$http.adornUrl('/web/config/get'),
-          method: 'get'
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.webconfig = data.config
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      },
-      getStatisticsBaseInfo () {
-        this.$http({
-          url: this.$http.adornUrl('/web/statistics/baseInfo'),
-          method: 'get'
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.immuneCellCnt = data.immuneCellCnt
-            this.genCnt = data.genCnt
-            this.cancerTypeCnt = data.cancerTypeCnt
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      },
-      search () {
-        let routeUrl = this.$router.resolve({
-          path: '/search-result',
-          query: { 'keyWords': this.keywords }
-        })
-        window.open(routeUrl.href, '_blank')
-       // this.$router.push({path: '/search-result', query: { 'keyWords': 1 }})
-      },
-
-      getColor (catagory) {
-        // eslint-disable-next-line eqeqeq,brace-style
-        if (catagory == 'cancerType') { return 'rgb(154,110,24)' }
-          // eslint-disable-next-line eqeqeq
-        else if (catagory == 'geneId') { return 'rgb(18,220,151)' } else if (catagory == 'immuneCell') return 'rgb(227,211,81)'
-        // eslint-disable-next-line eqeqeq
-        else if (catagory == 'genSymbol') { return 'rgb(193,41,21)' } else if (catagory == 'cancerTypeAd') return 'rgb(30,29,33)'
-        else return 'rgb(137,239,12)'
-      },
-
-      getTags () {
-        this.tags = []
-        this.$http({
-          url: this.$http.adornUrl('/rna/rnasearchrecord/web/quickSearchTags'),
-          method: 'get'
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.tagsNum = data.tagNum
-            let tagsTemp = []
-            console.log(data.tags)
-            for (let key in data.tags) {
-              data.tags[key].forEach(tag => {
-                let temp = {}
-                temp.catagory = key
-                temp.text = tag
-                tagsTemp.push(temp)
-              })
-            }
-
-            for (let i = 0; i < tagsTemp.length; i++) {
-              let tag = {}
-              let k = -1 + (2 * (i + 1) - 1) / this.tagsNum
-              let a = Math.acos(k)
-              let b = a * Math.sqrt(this.tagsNum * Math.PI)
-              tag.text = tagsTemp[i].text
-              tag.x = this.CX + this.RADIUS * Math.sin(a) * Math.cos(b)
-              tag.y = this.CY + this.RADIUS * Math.sin(a) * Math.sin(b)
-              tag.z = this.RADIUS * Math.cos(a)
-              tag.href = '/search-result?keyWords=' + tagsTemp[i].text
-              tag.fill = this.getColor(tagsTemp[i].catagory)
-              this.tags.push(tag)
-            }
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
-      },
-      getTopNews () {
-        this.$http({
-          url: this.$http.adornUrl('/web/news/topNews?topSize=' + 5),
-          method: 'get'
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.topNews = data.topNews
-          } else {
-            this.$message.error(data.msg)
-          }
-        })
+      if (key == 13) {
+        _this.search()
       }
     }
+
+    this.getSvg()
+  },
+  async  mounted () { // 使球开始旋转
+    window['handleClick'] = () => {
+      this.takePhoto()
+    }
+    setInterval(() => {
+      this.rotateX(this.speedX)
+      this.rotateY(this.speedY)
+    }, 30)
+  },
+  activated () {
+    this.getWebConfig()
+    this.getTopNews()
+    this.getStatisticsBaseInfo()
+    this.getTags()
+  },
+  watch: {
+    photoResult: {
+      handler (newVal, oldVal) {
+        this.getSvg()
+      },
+      deep: true
+    }
+  },
+  //https://editor.method.ac/#delete
+  methods: {
+    getSvg () {
+      const xhr = new XMLHttpRequest()
+      this.svgUrl = '../../../static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
+      xhr.open('GET', this.svgUrl, true)
+      xhr.send()
+
+      xhr.addEventListener('load', () => {
+        // ① 获取svg的dom
+        const resXML = xhr.responseXML
+        this.svgDom = resXML.documentElement.cloneNode(true)     // console.log(this.svgDom);
+
+        // ② 添加click事件
+        let btn = this.svgDom.getElementById('UBERON_9_1')
+        //btn.setAttribute('v-on:click', 'this.handleClick()')
+        // ↑↑↑ 此处注意：原生事件handleClick此时在window层，解决办法见后文
+
+        // ③ 修改 dom
+        //this.svgDom.getElementById('UBERON_9_1').childNodes[0].nodeValue = 1
+        //this.svgDom.getElementById('UBERON_9_1').setAttribute('style',
+         // `1.; fill:${this.photoResult.resultColor}; 1`)
+        // ↑↑↑ 用js操作dom的语法，动态设置svg部件的属性和值
+
+        // ④ 将svgDom对象转换成vue的虚拟dom，创建实例并挂载到元素上
+        var oSerializer = new XMLSerializer()
+        var sXML = oSerializer.serializeToString(this.svgDom)
+
+        console.log(sXML)
+        var Profile = Vue.extend({
+          template: "<div id='svgTemplate'>" + sXML + '</div>'
+        })
+        new Profile().$mount('#svgTemplate')
+      })
+    },
+
+    beforeDestroy () {
+      this.svgDom = null
+    },
+    takePhoto () {
+
+    },
+
+    rotateX (speedX) {
+      var cos = Math.cos(speedX)
+      var sin = Math.sin(speedX)
+      for (let tag of this.tags) {
+        var y1 = (tag.y - this.CY) * cos - tag.z * sin + this.CY
+        var z1 = tag.z * cos + (tag.y - this.CY) * sin
+        tag.y = y1
+        tag.z = z1
+      }
+    },
+    rotateY (speedY) {
+      var cos = Math.cos(speedY)
+      var sin = Math.sin(speedY)
+      for (let tag of this.tags) {
+        var x1 = (tag.x - this.CX) * cos - tag.z * sin + this.CX
+        var z1 = tag.z * cos + (tag.x - this.CX) * sin
+        tag.x = x1
+        tag.z = z1
+      }
+    },
+    listener (event) { // 响应鼠标移动
+      var x = event.clientX - this.CX
+      var y = event.clientY - this.CY
+      this.speedX = x * 0.0001 > 0 ? Math.min(this.RADIUS * 0.00002, x * 0.0001) : Math.max(-this.RADIUS * 0.00002, x * 0.0001)
+      this.speedY = y * 0.0001 > 0 ? Math.min(this.RADIUS * 0.00002, y * 0.0001) : Math.max(-this.RADIUS * 0.00002, y * 0.0001)
+    },
+    getWebConfig () {
+      this.$http({
+        url: this.$http.adornUrl('/web/config/get'),
+        method: 'get'
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.webconfig = data.config
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    getStatisticsBaseInfo () {
+      this.$http({
+        url: this.$http.adornUrl('/web/statistics/baseInfo'),
+        method: 'get'
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.immuneCellCnt = data.immuneCellCnt
+          this.genCnt = data.genCnt
+          this.cancerTypeCnt = data.cancerTypeCnt
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    search () {
+      let routeUrl = this.$router.resolve({
+        path: '/search-result',
+        query: { 'keyWords': this.keywords }
+      })
+      window.open(routeUrl.href, '_blank')
+       // this.$router.push({path: '/search-result', query: { 'keyWords': 1 }})
+    },
+
+    getColor (catagory) {
+        // eslint-disable-next-line eqeqeq,brace-style
+      if (catagory == 'cancerType') { return 'rgb(154,110,24)' }
+          // eslint-disable-next-line eqeqeq
+      else if (catagory == 'geneId') { return 'rgb(18,220,151)' } else if (catagory == 'immuneCell') return 'rgb(227,211,81)'
+        // eslint-disable-next-line eqeqeq
+      else if (catagory == 'genSymbol') { return 'rgb(193,41,21)' } else if (catagory == 'cancerTypeAd') return 'rgb(30,29,33)'
+      else return 'rgb(137,239,12)'
+    },
+
+    getTags () {
+      this.tags = []
+      this.$http({
+        url: this.$http.adornUrl('/rna/rnasearchrecord/web/quickSearchTags'),
+        method: 'get'
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.tagsNum = data.tagNum
+          let tagsTemp = []
+          console.log(data.tags)
+          for (let key in data.tags) {
+            data.tags[key].forEach(tag => {
+              let temp = {}
+              temp.catagory = key
+              temp.text = tag
+              tagsTemp.push(temp)
+            })
+          }
+
+          for (let i = 0; i < tagsTemp.length; i++) {
+            let tag = {}
+            let k = -1 + (2 * (i + 1) - 1) / this.tagsNum
+            let a = Math.acos(k)
+            let b = a * Math.sqrt(this.tagsNum * Math.PI)
+            tag.text = tagsTemp[i].text
+            tag.x = this.CX + this.RADIUS * Math.sin(a) * Math.cos(b)
+            tag.y = this.CY + this.RADIUS * Math.sin(a) * Math.sin(b)
+            tag.z = this.RADIUS * Math.cos(a)
+            tag.href = '/search-result?keyWords=' + tagsTemp[i].text
+            tag.fill = this.getColor(tagsTemp[i].catagory)
+            this.tags.push(tag)
+          }
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    getTopNews () {
+      this.$http({
+        url: this.$http.adornUrl('/web/news/topNews?topSize=' + 5),
+        method: 'get'
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.topNews = data.topNews
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    }
   }
+}
 </script>
 
 <style scoped>
