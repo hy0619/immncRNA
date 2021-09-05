@@ -87,7 +87,7 @@
 
   </div>
 </template>
-
+<script src = "/static/js/d3.min.js"></script>
 <script>
 import Vue from 'vue/dist/vue.esm.js'
 
@@ -153,8 +153,71 @@ export default {
       deep: true
     }
   },
-  //https://editor.method.ac/#delete
+  // https://editor.method.ac/#delete
   methods: {
+    highlight (path) {
+      for (var tissue of path) {
+        // eslint-disable-next-line no-undef
+        d3.select(tissue)
+      .on('mouseover', function () {
+        var nodeName = (this.id.split('_'))
+        for (var child of this.parentNode.children) {
+          var svg = d3.select(child)
+          // eslint-disable-next-line eqeqeq
+          if (nodeName[1] == '34') {
+            document.getElementById('UBERON_34_2').style.fontWeight = '900'
+            document.getElementById('UBERON_34_3').style.fontWeight = '900'
+            document.getElementById('UBERON_34_1').style.stroke = 'black'
+          } else if (nodeName[1] == '32') {
+            document.getElementById('UBERON_32_1').style.fontWeight = '900'
+            document.getElementById('UBERON_32_6').style.fontWeight = '900'
+            document.getElementById('UBERON_32_2').style.stroke = 'black'
+            document.getElementById('UBERON_32_3').style.stroke = 'black'
+            document.getElementById('UBERON_32_4').style.stroke = 'black'
+            document.getElementById('UBERON_32_5').style.stroke = 'black'
+          } else if (nodeName[1] == '19') {
+            document.getElementById('UBERON_19_1').style.fontWeight = '900'
+            document.getElementById('UBERON_19_4').style.fontWeight = '900'
+            document.getElementById('UBERON_19_2').style.stroke = '#000000'
+            document.getElementById('UBERON_19_3').style.stroke = '#000000'
+          } else if (nodeName[1] == '33') {
+            document.getElementById('UBERON_33_1').style.fontWeight = '900'
+            document.getElementById('UBERON_33_2').style.stroke = '#000000'
+          } else {
+            svg.attr('stroke', 'black').attr('stroke-width', '1')
+          }
+        }
+      })
+      .on('mouseout', function () {
+        var nodeName = (this.id.split('_'))
+        for (var child of this.parentNode.children) {
+          var svg = d3.select(child)
+          if (nodeName[1] == '34') {
+            document.getElementById('UBERON_34_1').style.stroke = '#6EC8D8'
+            document.getElementById('UBERON_34_2').style.fontWeight = '400'
+            document.getElementById('UBERON_34_3').style.fontWeight = '400'
+          } else if (nodeName[1] == '32') {
+            document.getElementById('UBERON_32_1').style.fontWeight = '400'
+            document.getElementById('UBERON_32_6').style.fontWeight = '400'
+            document.getElementById('UBERON_32_2').style.stroke = '#6EC8D8'
+            document.getElementById('UBERON_32_3').style.stroke = '#6EC8D8'
+            document.getElementById('UBERON_32_4').style.stroke = '#6EC8D8'
+            document.getElementById('UBERON_32_5').style.stroke = '#6EC8D8'
+          } else if (nodeName[1] == '19') {
+            document.getElementById('UBERON_19_1').style.fontWeight = '400'
+            document.getElementById('UBERON_19_4').style.fontWeight = '400'
+            document.getElementById('UBERON_19_2').style.stroke = '#cccccc'
+            document.getElementById('UBERON_19_3').style.stroke = '#cccccc'
+          } else if (nodeName[1] == '33') {
+            document.getElementById('UBERON_33_1').style.fontWeight = '400'
+            document.getElementById('UBERON_33_2').style.stroke = '#BC6D16'
+          } else {
+            svg.attr('stroke', 'black').attr('stroke-width', '0')
+          }
+        }
+      })
+      }
+    },
     getSvg () {
       const xhr = new XMLHttpRequest()
       this.svgUrl = '../../../static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
@@ -165,23 +228,27 @@ export default {
         // ① 获取svg的dom
         const resXML = xhr.responseXML
         this.svgDom = resXML.documentElement.cloneNode(true)     // console.log(this.svgDom);
-
         // ② 添加click事件
-        let btn = this.svgDom.getElementById('UBERON_9_1')
-        //btn.setAttribute('v-on:click', 'this.handleClick()')
-        // ↑↑↑ 此处注意：原生事件handleClick此时在window层，解决办法见后文
-
-        // ③ 修改 dom
-        //this.svgDom.getElementById('UBERON_9_1').childNodes[0].nodeValue = 1
-        //this.svgDom.getElementById('UBERON_9_1').setAttribute('style',
-         // `1.; fill:${this.photoResult.resultColor}; 1`)
-        // ↑↑↑ 用js操作dom的语法，动态设置svg部件的属性和值
+        let tags = this.svgDom.querySelectorAll('a')
+        console.log(tags)
+        for (let idx in tags) {
+          if (tags[idx] && typeof tags[idx] !== 'function' && idx !== 'length') {
+            console.log('==============' + idx)
+            console.log(tags[idx])
+            let keywords = tags[idx].getAttribute('id')
+            tags[idx].setAttribute('xlink:href'
+              , 'search-result?keyWords=' + keywords)
+          }
+        }
+        console.log(tags)
 
         // ④ 将svgDom对象转换成vue的虚拟dom，创建实例并挂载到元素上
         var oSerializer = new XMLSerializer()
         var sXML = oSerializer.serializeToString(this.svgDom)
 
-        console.log(sXML)
+        let path = document.querySelectorAll('[id^=UBERON]')
+        this.highlight(path)
+
         var Profile = Vue.extend({
           template: "<div id='svgTemplate'>" + sXML + '</div>'
         })
@@ -193,7 +260,7 @@ export default {
       this.svgDom = null
     },
     takePhoto () {
-
+      console.log(2222)
     },
 
     rotateX (speedX) {
