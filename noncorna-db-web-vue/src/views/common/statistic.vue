@@ -14,9 +14,9 @@
     <div class="statist_cnt">
         <div class="statist_bar">
           <div class="statist_bar_box" style="float: left">
-            <div class="chart_til">CANCER TYPE</div>
-            <div class="bar_cnt">
-              <div id="J_chartPieBox" class="chart-box"></div>
+            <div class="chart_til">DATABASE SEARCH COUNT BEFORE 7 DAYS</div>
+            <div class="graphBox" style="height: 380px;">
+              <div id="J_chartBarBox" class="chart-box"></div>
             </div>
           </div>
           <div class="statist_bar_box" style="float: right">
@@ -27,10 +27,11 @@
           </div>
         </div>
         <div style="margin-top: 25px;">
-          <div class="chart_til">DATABASE SEARCH COUNT BEFORE 7 DAYS</div>
-          <div class="graphBox" style="height: 380px;">
-            <div id="J_chartBarBox" class="chart-box"></div>
+          <div class="chart_til">CANCER TYPE</div>
+          <div class="bar_cnt">
+            <div id="J_chartPieBox" class="chart-box"></div>
           </div>
+
         </div>
         <div style="margin-top: 25px;">
           <div class="chart_til">DATABASE SEARCH COUNT BEFORE 7 DAYS</div>
@@ -271,17 +272,10 @@
                 emphasis: {
                   shadowBlur: 10,
                   shadowOffsetX: 0,
-                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  shadowColor: 'rgba(168,45,45,0.5)'
                 },
                 normal: {
-                  color: function (params) {
-                    // 自定义颜色
-                    var colorList = [
-                      '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD',
-                      '#D7504B', '#C6E579', '#F4E001', '#F0805A', '#26C0C0'
-                    ]
-                    return colorList[params.dataIndex]
-                  }
+
                 }
               },
               emphasis: {
@@ -346,11 +340,22 @@
           title: {
             text: 'GENE TYPE',
             left: 'center',
-            top: 20
+            top: 20,
+            textStyle: {
+              color: '#ccc'
+            }
           },
           tooltip: {
             trigger: 'item',
             formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          visualMap: {
+            show: false,
+            min: 80,
+            max: 600,
+            inRange: {
+              colorLightness: [0, 1]
+            }
           },
           legend: {
             type: 'scroll',
@@ -369,21 +374,17 @@
               data: [
 
               ],
+              roseType: 'radius',
               itemStyle: {
-                emphasis: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: 'rgba(0, 0, 0, 0.5)'
-                },
-                normal: {
-                  color: function (params) {
-                    // 自定义颜色
-                    var colorList = [
-                      '#06e4f8', '#e5360a', '#ab01f4', '#F0805A', '#26C0C0'
-                    ]
-                    return colorList[params.dataIndex]
-                  }
-                }
+                color: '#c23531',
+                shadowBlur: 200,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              },
+
+              animationType: 'scale',
+              animationEasing: 'elasticOut',
+              animationDelay: function (idx) {
+                return Math.random() * 200
               },
               emphasis: {
                 itemStyle: {
@@ -392,21 +393,15 @@
                 }
               },
               label: {
-                normal: {
-                  textStyle: {
-                    color: 'rgba(255, 255, 255, 0.3)'
-                  }
-                }
+                color: 'rgba(255, 255, 255, 0.3)'
               },
               labelLine: {
-                normal: {
-                  lineStyle: {
-                    color: 'rgba(255, 255, 255, 0.3)'
-                  },
-                  smooth: 0.2,
-                  length: 10,
-                  length2: 20
-                }
+                lineStyle: {
+                  color: 'rgba(255, 255, 255, 0.3)'
+                },
+                smooth: 0.2,
+                length: 10,
+                length2: 20
               }
             }
           ]

@@ -17,28 +17,35 @@
       </div>
     </div>
     <div class="index_main">
-      <!--  介绍    -->
-      <div class="welcome">
-        <div class="welcome_pic">
-          <img src="../../assets/img/pic.jpg" />
-        </div>
-        <div class="weclome_js">
-          <div class="welcome_til">
-            <p>Welcome to ImmncRNA</p>
-            <a href="#">Learn More+</a>
-          </div>
-          <p class="welcome_txt" v-html="webconfig.description"></p>
-        </div>
+      <div style="overflow: hidden">
+        <div class="main_left">
+          <!--  介绍    -->
+          <div class="welcome">
+            <div class="weclome_js">
+              <div class="welcome_til">
+                <p>Welcome to ImmncRNA</p>
+<!--                <a href="#">Learn More+</a>-->
+              </div>
+<!--              <p class="welcome_txt" v-html="webconfig.description"></p>-->
+              <p class="welcome_ny">Immncrna is a set of specialist databases related to the study of the relationship among tumors, immunity, and ncRNAs. This study provides a database resource for future studies of tumors and immune-related ncRNAs.    Each entry   contains  detailed information on references, PMID, gene symbol, gene type, cancer type, tissue origin, organism, target gene, downstream effect, function, immune cells and other information. This database includes the following features and data: links between  immune-related ncRNAs and target genes; proofs between immune-related ncRNAs and functions; lists of ncRNA-related immune cells and immune pathway. We believe it could be severed as a valuable resource for understanding the functions of ncRNAs,especially immune-related ncRNAs, and advancing the development of immunotherapy.</p>
+            </div>
 
+          </div>
+        </div>
+        <div class="main_right">
+          <div>
+            <div id="svgTemplate"></div>
+          </div>
+        </div>
       </div>
-      <!--      -->
-      <div class="index_bt">
+
+      <div style="overflow: hidden">
         <!--    Statistics      -->
         <div class="statisticsMain">
           <div class="quickTil">Statistics</div>
           <div>
 
-           <div class="statistBox2 statistBox">
+            <div class="statistBox2 statistBox">
               <p>GENE ID:</p>
               <span>{{ genCnt }}</span>
             </div>
@@ -53,35 +60,40 @@
             </div>
           </div>
         </div>
+
         <!--    news    -->
         <div class="newsMain">
-          <div>
-            <div id="svgTemplate"></div>
-          </div>
-         <!-- <div class="newsTil">
-            Latest News
-          </div>
-          <div class="newsCnt">
-            <ul class="newsList">
-              <li v-for = "news in topNews">
-                &lt;!&ndash;:href="news.linkUrl"&ndash;&gt;
-                <a target="_blank" >
-                  <p>{{ news.title }}</p>
-                  <span>{{ news.ct }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>-->
+
+          <div class="newsTil">
+             Latest News
+           </div>
+           <div class="newsCnt">
+             <ul class="newsList">
+               <li v-for = "news in topNews">
+                 <a target="_blank" >
+                   <p>{{ news.title }}</p>
+                   <span>{{ news.ct }}</span>
+                 </a>
+               </li>
+             </ul>
+           </div>
         </div>
+
         <!--    searcher    -->
         <div class="quickSerMain">
-          <div class="quickTil">Quick Search</div>
+          <div class="quickTil">Most Search</div>
           <svg :width='width' :height='height' @mousemove='listener($event)'>
             <a :href="tag.href" target="_blank" v-for='tag in tags' >
               <text :x='tag.x' :y='tag.y':fill="tag.fill" :font-size='15 * (600/(600-tag.z))' :fill-opacity='((400+tag.z)/600)'>{{tag.text}}</text>
             </a>
           </svg>
         </div>
+      </div>
+
+      <div style="overflow: hidden;margin-top: 12px;margin-bottom: 10px;">
+<!--        <div class="chart-1 chart-box" id="J_chartPieBox2">-->
+<!--        </div>-->
+<!--        <div class="chart-2 chart-box" id = "J_chartPieBox"></div>-->
       </div>
     </div>
 
@@ -91,6 +103,8 @@
 import Vue from 'vue/dist/vue.esm.js'
 
 import * as d3 from 'd3'// 引入d3
+
+import echarts from 'echarts'
 
 export default {
   data () {
@@ -107,7 +121,8 @@ export default {
       topNews: [],
       immuneCellCnt: 0,
       genCnt: 0,
-      cancerTypeCnt: 0
+      cancerTypeCnt: 0,
+      chartPie: null
 
     }
   },
@@ -139,12 +154,28 @@ export default {
       this.rotateX(this.speedX)
       this.rotateY(this.speedY)
     }, 30)
+
+    // this.initChartPie()
+    // this.initChartPie2()
   },
   activated () {
     this.getWebConfig()
     this.getTopNews()
     this.getStatisticsBaseInfo()
     this.getTags()
+
+    if (this.chartLine) {
+      this.chartLine.resize()
+    }
+    if (this.chartBar) {
+      this.chartBar.resize()
+    }
+    if (this.chartPie) {
+      this.chartPie.resize()
+    }
+    if (this.chartScatter) {
+      this.chartScatter.resize()
+    }
   },
   watch: {
     photoResult: {
@@ -205,8 +236,8 @@ export default {
             let organPicId = organId.split('_')[0] + '_' + organId.split('_')[1] + '_pic'
             // console.log(document.getElementById(fontId))
             document.getElementById(fontId).style.fontWeight = '400'
-            document.getElementById(organPicId).style.stroke = 'black'
-            document.getElementById(organPicId).style.strokeWidth = '0'
+            // document.getElementById(organPicId).style.stroke = 'black'
+            document.getElementById(organPicId).style.strokeWidth = '0.7'
             document.getElementById(fontId).style.fontSize = '10.29'
           })
         }
@@ -363,12 +394,240 @@ export default {
           this.$message.error(data.msg)
         }
       })
+    },
+    // 饼状图
+    initChartPie () {
+      var chartPie = echarts.init(document.getElementById('J_chartPieBox'))
+
+      var option = {
+        backgroundColor: '#ffffff',
+        title: {
+          text: 'CANCER TYPE',
+          left: 'center',
+          top: 20
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+          type: 'scroll',
+          orient: 'vertical',
+          right: 10,
+          top: 20,
+          bottom: 20,
+          data: []
+        },
+        series: [
+          {
+            name: 'CANCER TYPE',
+            type: 'pie',
+            radius: '55%',
+            center: ['40%', '50%'],
+            data: [
+
+            ],
+            itemStyle: {
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(168,45,45,0.5)'
+              },
+              normal: {
+
+              }
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0
+              }
+            },
+            label: {
+              normal: {
+                textStyle: {
+                  color: 'rgba(255, 255, 255, 0.3)'
+                }
+              }
+            },
+            labelLine: {
+              normal: {
+                lineStyle: {
+                  color: 'rgba(255, 255, 255, 0.3)'
+                },
+                smooth: 0.2,
+                length: 10,
+                length2: 20
+              }
+            }
+          }
+        ]
+      }
+      this.$http({
+        url: this.$http.adornUrl('/web/statistic/getCntByCol/cancer_type'),
+        method: 'get'
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          option.legend.data = []
+          option.series[0].data = []
+          for (let one of data.res) {
+            let info = {}
+            info.name = one.cancer_type
+            info.value = one.cnt
+            option.series[0].data.push(info)
+            option.legend.data.push(info.name)
+          }
+
+          chartPie.setOption(option)
+          window.addEventListener('resize', () => {
+            this.chartPie.resize()
+          })
+
+          console.log(option.series.data)
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+
+    initChartPie2 () {
+      var chartPie = echarts.init(document.getElementById('J_chartPieBox2'))
+
+      var option = {
+        backgroundColor: '#ffffff',
+        title: {
+          text: 'GENE TYPE',
+          left: 'center',
+          top: 20,
+          textStyle: {
+            color: '#ccc'
+          }
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        visualMap: {
+          show: false,
+          min: 80,
+          max: 600,
+          inRange: {
+            colorLightness: [0, 1]
+          }
+        },
+        legend: {
+          type: 'scroll',
+          orient: 'vertical',
+          right: 0,
+          top: 20,
+          bottom: 20,
+          data: []
+        },
+        series: [
+          {
+            name: 'CANCER TYPE',
+            type: 'pie',
+            radius: '55%',
+            center: ['40%', '50%'],
+            data: [
+
+            ],
+            roseType: 'radius',
+            itemStyle: {
+              color: '#c23531',
+              shadowBlur: 200,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            },
+
+            animationType: 'scale',
+            animationEasing: 'elasticOut',
+            animationDelay: function (idx) {
+              return Math.random() * 200
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0
+              }
+            },
+            label: {
+              color: 'rgba(255, 255, 255, 0.3)'
+            },
+            labelLine: {
+              normal: {
+                length: 1
+              },
+              lineStyle: {
+                color: 'rgba(255, 255, 255, 0.3)'
+              }
+
+            }
+          }
+        ]
+      }
+      this.$http({
+        url: this.$http.adornUrl('/web/statistic/getCntByCol/gene_type'),
+        method: 'get'
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          option.legend.data = []
+          option.series[0].data = []
+          for (let one of data.res) {
+            let info = {}
+            info.name = one.gene_type
+            info.value = one.cnt
+            option.series[0].data.push(info)
+            option.legend.data.push(info.name)
+          }
+
+          chartPie.setOption(option)
+
+          window.addEventListener('resize', () => {
+            this.chartPie.resize()
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
     }
   }
 }
 </script>
 
 <style scoped>
+  .main_right{
+    float: right;
+    width: 650px;
+  }
+  .main_left{
+    width: 520px;
+    float: left;
+  }
+  .welcome_ny{
+    text-indent: 2em;
+    font-size: 20px;
+    line-height: 32px;
+    text-align:justify;
+    text-justify:inter-ideograph;
+    color: #333333;
+  }
+  .chart-box{
+    float: left;
+    height: 500px;
+  }
+  .chart-1{
+    width: 390px;
+    margin-right: 10px;
+  }
+  .chart-2{
+    width: 700px;
+    margin-right: 10px;
+  }
+  /*.chart-3{*/
+  /*  width: 340px;*/
+  /*  margin-right: 10px;*/
+  /*}*/
+
   .welcome{
     width: 100%;
     display: flex;

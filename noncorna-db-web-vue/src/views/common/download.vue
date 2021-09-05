@@ -44,7 +44,8 @@
                 label="Download">
 
                 <template slot-scope="scope">
-                  <el-button type="text" size="small" @click="download(1 , scope.row.category)">download</el-button>
+                  <el-button type="text" size="small" @click="download(1 , scope.row.category)">excel</el-button>
+                  <el-button type="text" size="small" @click="downloadCvs(1 , scope.row.category)">cvs</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -107,6 +108,23 @@ export default {
     download (downType, value) {
       this.$http({
         url: this.$http.adornUrl('/rna/rnainfo/web/downloadByCategory'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'column': downType === 0 ? '' : this.getColumn(),
+          'value': value
+        }),
+        responseType: 'blob'
+      }).then(({data}) => {
+        let blob = new Blob([data], {
+          type: 'application/vnd.ms-excel'      // 将会被放入到blob中的数组内容的MIME类型
+        })
+        let objectUrl = URL.createObjectURL(blob)  // 生成一个url
+        window.location.href = objectUrl   // 浏览器打开这个url
+      })
+    },
+    downloadCvs (downType, value) {
+      this.$http({
+        url: this.$http.adornUrl('/rna/rnainfo/web/downloadByCategory4cvs'),
         method: 'get',
         params: this.$http.adornParams({
           'column': downType === 0 ? '' : this.getColumn(),
