@@ -59,9 +59,11 @@ router.beforeEach((to, from, next) => {
         fnAddDynamicMenuRoutes(data.navs)
         router.options.isAddDynamicMenuRoutes = true
 
+/*
         console.log('--------------data.navs-------------')
         console.log(data.navs)
         console.log('--------------data.navs--------------')
+*/
         sessionStorage.setItem('navList', JSON.stringify(data.navs || '[]'))
         next({...to, replace: true})
       } else {

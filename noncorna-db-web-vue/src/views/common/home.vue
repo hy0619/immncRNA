@@ -87,9 +87,10 @@
 
   </div>
 </template>
-<script src = "/static/js/d3.min.js"></script>
 <script>
 import Vue from 'vue/dist/vue.esm.js'
+
+import * as d3 from 'd3'// 引入d3
 
 export default {
   data () {
@@ -155,69 +156,6 @@ export default {
   },
   // https://editor.method.ac/#delete
   methods: {
-    highlight (path) {
-      for (var tissue of path) {
-        // eslint-disable-next-line no-undef
-        d3.select(tissue)
-      .on('mouseover', function () {
-        var nodeName = (this.id.split('_'))
-        for (var child of this.parentNode.children) {
-          var svg = d3.select(child)
-          // eslint-disable-next-line eqeqeq
-          if (nodeName[1] == '34') {
-            document.getElementById('UBERON_34_2').style.fontWeight = '900'
-            document.getElementById('UBERON_34_3').style.fontWeight = '900'
-            document.getElementById('UBERON_34_1').style.stroke = 'black'
-          } else if (nodeName[1] == '32') {
-            document.getElementById('UBERON_32_1').style.fontWeight = '900'
-            document.getElementById('UBERON_32_6').style.fontWeight = '900'
-            document.getElementById('UBERON_32_2').style.stroke = 'black'
-            document.getElementById('UBERON_32_3').style.stroke = 'black'
-            document.getElementById('UBERON_32_4').style.stroke = 'black'
-            document.getElementById('UBERON_32_5').style.stroke = 'black'
-          } else if (nodeName[1] == '19') {
-            document.getElementById('UBERON_19_1').style.fontWeight = '900'
-            document.getElementById('UBERON_19_4').style.fontWeight = '900'
-            document.getElementById('UBERON_19_2').style.stroke = '#000000'
-            document.getElementById('UBERON_19_3').style.stroke = '#000000'
-          } else if (nodeName[1] == '33') {
-            document.getElementById('UBERON_33_1').style.fontWeight = '900'
-            document.getElementById('UBERON_33_2').style.stroke = '#000000'
-          } else {
-            svg.attr('stroke', 'black').attr('stroke-width', '1')
-          }
-        }
-      })
-      .on('mouseout', function () {
-        var nodeName = (this.id.split('_'))
-        for (var child of this.parentNode.children) {
-          var svg = d3.select(child)
-          if (nodeName[1] == '34') {
-            document.getElementById('UBERON_34_1').style.stroke = '#6EC8D8'
-            document.getElementById('UBERON_34_2').style.fontWeight = '400'
-            document.getElementById('UBERON_34_3').style.fontWeight = '400'
-          } else if (nodeName[1] == '32') {
-            document.getElementById('UBERON_32_1').style.fontWeight = '400'
-            document.getElementById('UBERON_32_6').style.fontWeight = '400'
-            document.getElementById('UBERON_32_2').style.stroke = '#6EC8D8'
-            document.getElementById('UBERON_32_3').style.stroke = '#6EC8D8'
-            document.getElementById('UBERON_32_4').style.stroke = '#6EC8D8'
-            document.getElementById('UBERON_32_5').style.stroke = '#6EC8D8'
-          } else if (nodeName[1] == '19') {
-            document.getElementById('UBERON_19_1').style.fontWeight = '400'
-            document.getElementById('UBERON_19_4').style.fontWeight = '400'
-            document.getElementById('UBERON_19_2').style.stroke = '#cccccc'
-            document.getElementById('UBERON_19_3').style.stroke = '#cccccc'
-          } else if (nodeName[1] == '33') {
-            document.getElementById('UBERON_33_1').style.fontWeight = '400'
-            document.getElementById('UBERON_33_2').style.stroke = '#BC6D16'
-          } else {
-            svg.attr('stroke', 'black').attr('stroke-width', '0')
-          }
-        }
-      })
-      }
-    },
     getSvg () {
       const xhr = new XMLHttpRequest()
       this.svgUrl = '../../../static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
@@ -230,29 +168,72 @@ export default {
         this.svgDom = resXML.documentElement.cloneNode(true)     // console.log(this.svgDom);
         // ② 添加click事件
         let tags = this.svgDom.querySelectorAll('a')
-        console.log(tags)
         for (let idx in tags) {
           if (tags[idx] && typeof tags[idx] !== 'function' && idx !== 'length') {
-            console.log('==============' + idx)
-            console.log(tags[idx])
-            let keywords = tags[idx].getAttribute('id')
+            let keywords = tags[idx].getAttribute('id').split('_')[1]
             tags[idx].setAttribute('xlink:href'
               , 'search-result?keyWords=' + keywords)
           }
         }
-        console.log(tags)
-
         // ④ 将svgDom对象转换成vue的虚拟dom，创建实例并挂载到元素上
         var oSerializer = new XMLSerializer()
         var sXML = oSerializer.serializeToString(this.svgDom)
-
-        let path = document.querySelectorAll('[id^=UBERON]')
-        this.highlight(path)
 
         var Profile = Vue.extend({
           template: "<div id='svgTemplate'>" + sXML + '</div>'
         })
         new Profile().$mount('#svgTemplate')
+
+        let path = document.querySelectorAll('[id^=organ_]')
+
+        // let path = this.svgDom.querySelectorAll('[id^=organ_]')
+        for (let tissue of path) {
+          d3.select(tissue).on('mouseover', function () {
+            let organId = this.getAttribute('id')
+            let fontId = organId.split('_')[0] + '_' + organId.split('_')[1] + '_text'
+            console.log('fontId:' + fontId)
+            let organPicId = organId.split('_')[0] + '_' + organId.split('_')[1] + '_pic'
+            console.log('organPicId:' + organPicId)
+            // console.log(document.getElementById(fontId))
+            document.getElementById(fontId).style.fontWeight = '900'
+            document.getElementById(organPicId).style.stroke = 'black'
+            document.getElementById(organPicId).style.strokeWidth = '1'
+            document.getElementById(fontId).style.fontSize = '13'
+          }).on('mouseout', function () {
+            let organId = this.getAttribute('id')
+            let fontId = organId.split('_')[0] + '_' + organId.split('_')[1] + '_text'
+            let organPicId = organId.split('_')[0] + '_' + organId.split('_')[1] + '_pic'
+            // console.log(document.getElementById(fontId))
+            document.getElementById(fontId).style.fontWeight = '400'
+            document.getElementById(organPicId).style.stroke = 'black'
+            document.getElementById(organPicId).style.strokeWidth = '0'
+            document.getElementById(fontId).style.fontSize = '10.29'
+          })
+        }
+
+       /* d3.select(path).on('mouseover', function () {
+          console.log('------------------')
+        }).on('mouseout', function () {
+
+        })
+
+        console.log(path) */
+        // eslint-disable-next-line no-unused-vars
+        // for (let tissue of path) {
+        //   console.log(tissue)
+        //   d3.select(tissue).on('mouseover', function () {
+        //     console.log('------------------')
+        //   }).on('mouseout', function () {
+        //
+        //   })
+        // }
+        /* let brain = document.getElementById('organ_Brain_pic')
+        console.log(d3)
+        d3.select(brain).on('mouseover', function () {
+          console.log('------------------')
+        }).on('mouseout', function () {
+
+        }) */
       })
     },
 

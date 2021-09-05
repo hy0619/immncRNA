@@ -182,7 +182,7 @@ import tree from 'vue-giant-tree'
 
 export default {
   components: {
-      tree
+    tree
   },
   created () {
     this.getTree()
@@ -196,7 +196,7 @@ export default {
   watch: {
     filterText (val) {
       this.onSearch(val)
-      //this.$refs.tree.filter(val)
+      // this.$refs.tree.filter(val)
     }
   },
 
@@ -216,22 +216,22 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       tree: [],
-      zTree: null ,
+      zTree: null,
       firstNode: true,
       expandNode: [],
       setting: {
         data: {
           simpleData: {
             enable: true,
-            pIdKey: "pid"
+            pIdKey: 'pid'
           }
         },
         view: {
           showIcon: false,
           addHoverDom: this.addHoverDom,
           removeHoverDom: this.removeHoverDom,
-          fontCss: function(treeId , treeNode){
-            return (treeNode.searchNode) ? {color:"#A60000" , "font-weight" : "bold"} : ""
+          fontCss: function (treeId, treeNode) {
+            return (treeNode.searchNode) ? {color: '#A60000', 'font-weight': 'bold'} : ''
           }
         }
       }
@@ -240,101 +240,77 @@ export default {
   },
   methods: {
 
-    handleCreated(ztreeObj){
+    handleCreated (ztreeObj) {
+      this.zTree = ztreeObj
 
+      let firstTree = ztreeObj.getNodes()[0]
 
-this.zTree = ztreeObj
-
-let firstTree = ztreeObj.getNodes()[0]
-
-ztreeObj.expandNode(firstTree); // 展开第一行
-
-},
-
-    handleNodeClick (evt , treeId , node) {
-      if(!node.children) {
-        this.dataForm[node.category] = node.name
-      }else{
-          this.dataForm[node.category] = ""
-      }
-      this.getDataList();
-
+      ztreeObj.expandNode(firstTree) // 展开第一行
     },
 
-    onSearch(value){
-
-if(value){
-
-this.zTree.refresh()
-
-let nodeList = this.zTree.getNodesByParamFuzzy('name', value) //模糊搜索
-
-if(this.expandNode.length > 0){
-
-for(let j in this.expandNode){
-
-this.closeParentNode(this.expandNode[j])
-
-}
-
+    handleNodeClick (evt, treeId, node) {
+      if (!node.children) {
+        this.dataForm[node.category] = node.name
+      } else {
+        this.dataForm[node.category] = ''
       }
+      this.getDataList()
+    },
 
-      this.expandNode = []
+    onSearch (value) {
+      if (value) {
+        this.zTree.refresh()
 
-      let timeout = setTimeout(() =>{
+        let nodeList = this.zTree.getNodesByParamFuzzy('name', value) // 模糊搜索
 
-clearTimeout(timeout)
+        if (this.expandNode.length > 0) {
+          for (let j in this.expandNode) {
+            this.closeParentNode(this.expandNode[j])
+          }
+        }
 
-for(let i in nodeList){
+        this.expandNode = []
 
-this.firstNode = true ;
-                      this.getParentNode(nodeList[i])
+        let timeout = setTimeout(() => {
+          clearTimeout(timeout)
 
-}
+          for (let i in nodeList) {
+            this.firstNode = true
+            this.getParentNode(nodeList[i])
+          }
+        }, 300)
+      }
+    },
 
-},300) }
+    closeParentNode (node) { // 关闭之前展开的节点
+      if (node) {
+        let parentNode = node.getParentNode()
 
-},
+        if (parentNode) {
+          this.zTree.expandNode(parentNode, false, false, false) // 关闭节点
 
-closeParentNode(node){ //关闭之前展开的节点
+          this.closeParentNode(parentNode)
+        }
 
-if(node){
+        this.zTree.expandNode(node, false, false, false)// 关闭节点
+      }
+    },
 
-let parentNode = node.getParentNode()
+    getParentNode (node) {
+      let parentNode = node.getParentNode()
 
-if(parentNode){
+      this.expandNode.push(parentNode) // 保存展开节点
 
-this.zTree.expandNode(parentNode,false,false,false) //关闭节点
+      if (this.firstNode) {
+        this.firstNode = false
 
-this.closeParentNode(parentNode)
+        node.searchNode = 'searchNode'
 
-}
+        this.zTree.expandNode(parentNode, true, false, false)// 展开节点
 
-this.zTree.expandNode(node,false,false,false)//关闭节点
-
-}
-
-},
-
-getParentNode(node){
-
-let parentNode = node.getParentNode()
-
-this.expandNode.push(parentNode) //保存展开节点
-
-   if(this.firstNode){
-
-this.firstNode = false
-
-node.searchNode = 'searchNode'
-
-this.zTree.expandNode(parentNode,true,false,false)//展开节点
-
-this.zTree.updateNode(node) ;node.searchNode = ''
-
-}
-
-},
+        this.zTree.updateNode(node); node.searchNode = ''
+      }
+    },
 
     getDataList () {
       this.dataListLoading = true
