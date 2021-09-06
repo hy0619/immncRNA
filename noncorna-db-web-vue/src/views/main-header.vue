@@ -1,7 +1,9 @@
 <template>
-  <div class="header_main">
+  <div class="header_main" :class="{'header_fix':needFix == true}">
     <div class="header_cnt">
-      <div class="header_logo" @click="gotoIndex()"><img :src="imageUrl"  style="width: 214px;"></img></div>
+      <div class="header_logo" @click="gotoIndex()">
+        <img :src="imageUrl"  style="width: 214px;"/>
+      </div>
       <div id="nav" class="nav">
         <el-menu
           :default-active="activeName"
@@ -26,6 +28,7 @@ export default {
   data () {
     return {
       navs: [],
+      needFix:false,
       activeName: '',
       dynamicMenuRoutes: [],
       imageUrl: require('@/assets/img/logo.jpg')
@@ -34,6 +37,9 @@ export default {
   components: {
     SubMenu
   },
+  mounted(){
+    window.addEventListener("scroll",this.handleScore)
+  },
   created () {
     console.log(this.$route)
     this.activeName = this.$route.meta.navId + ''
@@ -41,6 +47,16 @@ export default {
     this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
   },
   methods: {
+    // 滚动导航固定
+    handleScore(){
+      let self = this
+      let scoreTop = window.pageYOffset || document.documentElement.scoreTop || document.body.scoreTop
+      if(scoreTop>100){
+        this.needFix = true
+      }else{
+        this.needFix = false
+      }
+    },
     gotoIndex () {
       window.location = '/home'
     }
@@ -50,6 +66,13 @@ export default {
 
 
 <style scoped>
+.header_fix{
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  border-bottom: 1px solid #ebeff4;
+}
 .el-menu-item {
   font-size: 20px;
 }
@@ -84,8 +107,8 @@ export default {
   border-bottom: 0 !important;
 }
 /deep/.el-menu--horizontal>.el-menu-item{
-  height: 90px !important;
-  line-height: 90px !important;
+  height: 89px !important;
+  line-height: 89px !important;
 }
 /deep/.el-menu--horizontal>.el-menu-item.is-active{
   background-color: #114694 !important;
