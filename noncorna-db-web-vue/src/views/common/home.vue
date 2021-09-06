@@ -84,7 +84,7 @@
           <div class="chart-1 chart-box" id="J_chartPieBox2"></div>
         </div>
 
-        <div class="quickSerMain" style="width: 550px">
+        <div class="quickSerMain" style="width: 445px">
           <div class="chart-2 chart-box" id="J_chartPieBox"></div>
         </div>
       </div>
@@ -482,31 +482,31 @@ export default {
           {
             name: "Gene ID",
             type: "line",
-            stack: "num",
+            stack: "总量",
             data: [120, 132, 101, 134, 90, 230, 210],
           },
           {
             name: "Tissue Origin",
             type: "line",
-            stack: "num",
+            stack: "总量",
             data: [220, 182, 191, 234, 290, 330, 310],
           },
           {
             name: "Cancer Type",
             type: "line",
-            stack: "num",
+            stack: "总量",
             data: [150, 232, 201, 154, 190, 330, 410],
           },
           {
             name: "Gen Type",
             type: "line",
-            stack: "num",
+            stack: "总量",
             data: [320, 332, 301, 334, 390, 330, 320],
           },
           {
             name: "Suvival",
             type: "line",
-            stack: "num",
+            stack: "总量",
             data: [820, 932, 901, 934, 1290, 1330, 1320],
           },
         ],
@@ -520,8 +520,8 @@ export default {
           let endYear = data.max;
           let startYear =  2020;
 
-          // console.log(endYear)
-          // console.log(startYear)
+          console.log(endYear)
+          console.log(startYear)
           let xAxisDataArr =new Array()
           for (let i = startYear; i <endYear; i++) {
            xAxisDataArr.push(i);
