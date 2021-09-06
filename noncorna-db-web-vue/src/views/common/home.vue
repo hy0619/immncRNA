@@ -104,16 +104,13 @@
 
       </div>
 
-      <div style="overflow: hidden;margin-top: 12px;margin-bottom: 10px;">
-<<<<<<< HEAD
+      <!-- <div style="overflow: hidden;margin-top: 12px;margin-bottom: 10px;">
 
-
-=======
        <div class="chart-1 chart-box" id="J_chartPieBox2">
        </div>
        <div class="chart-2 chart-box" id = "J_chartPieBox"></div>
->>>>>>> remotes/origin/main
-      </div>
+
+      </div> -->
     </div>
 
   </div>
@@ -514,9 +511,9 @@ export default {
     calculable : true,
 
 =======
-        
+
     calculable : true,
-       
+
 >>>>>>> remotes/origin/main
         legend: {
           type: 'scroll',
