@@ -506,15 +506,8 @@ export default {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-<<<<<<< HEAD
 
     calculable : true,
-
-=======
-
-    calculable : true,
-
->>>>>>> remotes/origin/main
         legend: {
           type: 'scroll',
           orient: 'vertical',
