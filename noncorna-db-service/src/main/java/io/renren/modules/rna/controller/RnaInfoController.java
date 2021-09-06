@@ -325,7 +325,7 @@ public class RnaInfoController {
             rMap.put(Integer.valueOf("" + dataMap.get("pubTime")), Integer.valueOf("" +dataMap.get("dataNum")));
         }
 
-        for(int i = startYear;  i<endYear ; i++ ){
+        for(int i = startYear;  i<=endYear ; i++ ){
             if(rMap.get(i)!=null){
                 resList.add(rMap.get(i));
             }else{
