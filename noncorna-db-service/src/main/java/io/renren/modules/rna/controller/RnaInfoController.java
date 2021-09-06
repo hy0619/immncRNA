@@ -276,6 +276,92 @@ public class RnaInfoController {
 
 
     }
+    @GetMapping("/web/getMaxAndMinPubTime")
+    public R getMaxAndMinPubTime(){
+        QueryWrapper queryWrapper =
+                new QueryWrapper<RnaCategoryEntity>()
+                        .select( "max(pub_time) as pubTime " )
+                        .eq("status" , 0 )
+                        .ne("pub_time" , "")
+                ;
+
+        QueryWrapper queryWrapper2 =
+                new QueryWrapper<RnaCategoryEntity>()
+                        .select( "min(pub_time)  as pubTime" )
+                        .eq("status" , 0 )
+                        .ne("pub_time" , "")
+                ;
+        RnaInfoEntity maxPubTimeEntity = rnaInfoService.getOne(queryWrapper);
+
+        RnaInfoEntity minPubTimeEntity = rnaInfoService.getOne(queryWrapper2);
+
+
+        R ok = R.ok();
+        ok.put("max" , null == maxPubTimeEntity ? 2021 : Integer.valueOf(maxPubTimeEntity.getPubTime()) );
+
+        ok.put("min" , null == minPubTimeEntity ? 2020 : Integer.valueOf(minPubTimeEntity.getPubTime()) );
+        return ok;
+    }
+
+    private List<Integer> getNumByPubTime(String column , Integer startYear , Integer endYear){
+        QueryWrapper queryWrapper =
+                new QueryWrapper<RnaCategoryEntity>()
+                        .select( "pub_time  as pubTime, count(distinct "+column+ ") as dataNum" )
+                        .eq("status" , 0 )
+                        .ge("pub_time" , startYear)
+                        .le("pub_time" , endYear)
+                        .groupBy("pub_time")
+                        .orderByDesc("pub_time")
+                ;
+
+        List<Map<String, Object>> list = rnaInfoService.listMaps(queryWrapper);
+
+        Map<Integer , Integer> rMap = new HashMap<>();
+
+
+        List<Integer> resList = new ArrayList();
+
+        for(Map<String, Object> dataMap : list){
+            rMap.put(Integer.valueOf("" + dataMap.get("pubTime")), Integer.valueOf("" +dataMap.get("dataNum")));
+        }
+
+        for(int i = startYear;  i<endYear ; i++ ){
+            if(rMap.get(i)!=null){
+                resList.add(rMap.get(i));
+            }else{
+                resList.add(0);
+            }
+        }
+
+        return resList;
+    }
+
+
+    @GetMapping("/web/getCateGroyNumGroupByPubTime")
+    public R getCateGroyNumGroupByPubTime(@RequestParam Map<String, Object> map){
+
+        Integer startYear = Integer.valueOf((String) map.get("startYear")) ;
+        Integer endYear = Integer.valueOf((String)map.get("endYear"));
+
+
+        List<Integer> geneIdList = this.getNumByPubTime("gene_id", startYear, endYear);
+        List<Integer> tissueOriginList = this.getNumByPubTime("tissue_origin" , startYear , endYear);
+        List<Integer> cancerTypeList = this.getNumByPubTime("cancer_type" , startYear , endYear);
+        List<Integer> suvivalList = this.getNumByPubTime("suvival" , startYear , endYear);
+        List<Integer> geneTypeList = this.getNumByPubTime("gene_type" , startYear , endYear);
+
+        R ok = R.ok();
+
+        ok.put("geneIdList" , geneIdList);
+        ok.put("tissueOriginList" , tissueOriginList);
+        ok.put("cancerTypeList" , cancerTypeList);
+        ok.put("geneTypeList" , geneTypeList);
+        ok.put("suvivalList" , suvivalList);
+
+
+        return ok;
+
+    }
 
 
     @GetMapping("/web/downloadByCategory")
