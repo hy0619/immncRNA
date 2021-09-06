@@ -35,7 +35,10 @@ public class RnaStatisticController {
     public R getCntByCol(@PathVariable String col) {
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("status", 0);
+        queryWrapper.ne(col , "");
+        queryWrapper.isNotNull(col);
         queryWrapper.select(col, "count(*) as cnt")
+
                 .groupBy(col);
         return R.ok().put("res", rnaInfoService.queryByMap(queryWrapper));
 
