@@ -14,7 +14,7 @@
                           prefix-icon="el-icon-search"
                 style="width: 300px">
                 </el-input>
-                <el-button type="primary" @click="getQuickSearchRes()" style="height: 40px">Search</el-button>
+                <el-button type="primary" @click="getDataList ()" style="height: 40px">Search</el-button>
               </div>
             </div>
           </div>
@@ -185,18 +185,20 @@ export default {
   created () {
     let keyWords = this.$route.params.keyWords || this.$route.query.keyWords
     this.keywords = keyWords
-    this.getQuickSearchRes()
+    this.getDataList()
   },
   methods: {
     gotoIndex () {
       window.location = '/home'
     },
-    getQuickSearchRes () {
+    getDataList  () {
       this.dataListLoading = true
       this.$http({
         url: this.$http.adornUrl('/rna/rnainfo/web/search'),
         method: 'get',
         params: this.$http.adornParams({
+          'page': this.pageIndex,
+          'limit': this.pageSize,
           'keyWords': this.keywords,
           'status': 0
         })

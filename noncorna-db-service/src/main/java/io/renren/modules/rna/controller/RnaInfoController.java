@@ -1,5 +1,7 @@
 package io.renren.modules.rna.controller;
 
+import cn.afterturn.easypoi.csv.CsvExportUtil;
+import cn.afterturn.easypoi.csv.entity.CsvExportParams;
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -290,4 +293,23 @@ public class RnaInfoController {
                 "LmmRNA DATA" , true, response);
 
     }
+
+    @GetMapping("/web/downloadByCategory4cvs")
+    public void downloadByCategory4cvs(@RequestParam Map<String, Object> map ,HttpServletResponse response) throws IOException {
+        String column = (String) map.get("column");
+        String value = (String) map.get("value");
+        //Map<String , Object> params = new HashMap<>(2);
+        QueryWrapper<RnaInfoEntity> queryWrapper = new QueryWrapper<>();
+        if(!StringUtils.isEmpty(column) && !StringUtils.isEmpty(value)){
+            queryWrapper.like(column , value);
+        }
+        List list = rnaInfoService.list(queryWrapper);
+        CsvExportParams exportParams = new CsvExportParams("utf-8");
+        String fileName = "attachment;filename=download.cvs";
+        response.setHeader("Content-Disposition", new String(fileName.getBytes(), "utf-8"));
+        CsvExportUtil.exportCsv(exportParams , RnaInfoEntity.class , list, response.getOutputStream());
+
+    }
+
+
 }
