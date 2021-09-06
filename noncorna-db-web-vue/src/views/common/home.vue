@@ -61,15 +61,28 @@
           </div>
         </div>
 
-        <!--    news    -->
         <div class="newsMain">
+          <div class="chart-1 chart-box" id="J_chartPieBox2">
+          </div>
+        </div>
+
+        <div class="quickSerMain" style="width:445px;">
+          <div class="chart-2 chart-box" id = "J_chartPieBox"></div>
+        </div>
+
+
+      </div>
+
+      <div style="overflow:hidden">
+        <!--    news    -->
+        <div class="newsMain" style="width:600px;">
 
           <div class="newsTil">
              Latest News
            </div>
            <div class="newsCnt">
              <ul class="newsList">
-               <li v-for = "news in topNews">
+               <li v-for = "(news,index) in topNews" :key="index">
                  <a target="_blank" >
                    <p>{{ news.title }}</p>
                    <span>{{ news.ct }}</span>
@@ -80,20 +93,20 @@
         </div>
 
         <!--    searcher    -->
-        <div class="quickSerMain">
+        <div class="quickSerMain" style="width:550px;">
           <div class="quickTil">Most Search</div>
           <svg :width='width' :height='height' @mousemove='listener($event)'>
-            <a :href="tag.href" target="_blank" v-for='tag in tags' >
+            <a :href="tag.href" target="_blank" v-for='(tag,index) in tags' :key="index">
               <text :x='tag.x' :y='tag.y':fill="tag.fill" :font-size='15 * (600/(600-tag.z))' :fill-opacity='((400+tag.z)/600)'>{{tag.text}}</text>
             </a>
           </svg>
         </div>
+
       </div>
 
       <div style="overflow: hidden;margin-top: 12px;margin-bottom: 10px;">
-<!--        <div class="chart-1 chart-box" id="J_chartPieBox2">-->
-<!--        </div>-->
-<!--        <div class="chart-2 chart-box" id = "J_chartPieBox"></div>-->
+
+
       </div>
     </div>
 
@@ -110,7 +123,7 @@ export default {
   data () {
     return {
       keywords: '',
-      width: 384,
+      width: 484,
       height: 354,
       tagsNum: 20,
       RADIUS: 130,
@@ -155,8 +168,8 @@ export default {
       this.rotateY(this.speedY)
     }, 30)
 
-    // this.initChartPie()
-    // this.initChartPie2()
+     this.initChartPie()
+     this.initChartPie2()
   },
   activated () {
     this.getWebConfig()
@@ -190,7 +203,7 @@ export default {
   methods: {
     getSvg () {
       const xhr = new XMLHttpRequest()
-      this.svgUrl = 'http://119.45.191.10/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
+      this.svgUrl = 'http://localhost:8001/static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
       xhr.open('GET', this.svgUrl, true)
       console.log(111);
       xhr.send()
@@ -240,34 +253,10 @@ export default {
             // console.log(document.getElementById(fontId))
             document.getElementById(fontId).style.fontWeight = '400'
             // document.getElementById(organPicId).style.stroke = 'black'
-            document.getElementById(organPicId).style.strokeWidth = '0.7'
+            document.getElementById(organPicId).style.strokeWidth = '0.3'
             document.getElementById(fontId).style.fontSize = '10.29'
           })
         }
-
-       /* d3.select(path).on('mouseover', function () {
-          console.log('------------------')
-        }).on('mouseout', function () {
-
-        })
-
-        console.log(path) */
-        // eslint-disable-next-line no-unused-vars
-        // for (let tissue of path) {
-        //   console.log(tissue)
-        //   d3.select(tissue).on('mouseover', function () {
-        //     console.log('------------------')
-        //   }).on('mouseout', function () {
-        //
-        //   })
-        // }
-        /* let brain = document.getElementById('organ_Brain_pic')
-        console.log(d3)
-        d3.select(brain).on('mouseover', function () {
-          console.log('------------------')
-        }).on('mouseout', function () {
-
-        }) */
       })
     },
 
@@ -403,7 +392,7 @@ export default {
       var chartPie = echarts.init(document.getElementById('J_chartPieBox'))
 
       var option = {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#ebeff4',
         title: {
           text: 'CANCER TYPE',
           left: 'center',
@@ -416,17 +405,20 @@ export default {
         legend: {
           type: 'scroll',
           orient: 'vertical',
-          right: 10,
+          left: 10,
           top: 20,
           bottom: 20,
-          data: []
+          data: [],
+          formatter: function(name){
+      　　　　return name.length>10 ? name.substr(0,10)+"...":name;
+      　　}
         },
         series: [
           {
             name: 'CANCER TYPE',
             type: 'pie',
             radius: '55%',
-            center: ['40%', '50%'],
+            center: ['42%', '50%'],
             data: [
 
             ],
@@ -493,36 +485,32 @@ export default {
       })
     },
 
+
+
+
+
     initChartPie2 () {
       var chartPie = echarts.init(document.getElementById('J_chartPieBox2'))
 
       var option = {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#ebeff4',
         title: {
           text: 'GENE TYPE',
           left: 'center',
-          top: 20,
-          textStyle: {
-            color: '#ccc'
-          }
+          top: 20
         },
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-        visualMap: {
-          show: false,
-          min: 80,
-          max: 600,
-          inRange: {
-            colorLightness: [0, 1]
-          }
-        },
+
+    calculable : true,
+
         legend: {
           type: 'scroll',
           orient: 'vertical',
-          right: 0,
-          top: 20,
+          right:0,
+          top: 10,
           bottom: 20,
           data: []
         },
@@ -530,7 +518,7 @@ export default {
           {
             name: 'CANCER TYPE',
             type: 'pie',
-            radius: '55%',
+            radius : [20, 100],                 // 图表内外半径大小
             center: ['40%', '50%'],
             data: [
 
@@ -554,7 +542,11 @@ export default {
               }
             },
             label: {
-              color: 'rgba(255, 255, 255, 0.3)'
+              color: 'rgba(255, 255, 255, 0.3)',
+               normal: {
+                    show: true,
+                    formatter: '{b}({d}%)'      // 显示百分比
+                }
             },
             labelLine: {
               normal: {
@@ -619,7 +611,7 @@ export default {
     height: 500px;
   }
   .chart-1{
-    width: 390px;
+    width: 450px;
     margin-right: 10px;
   }
   .chart-2{
@@ -658,7 +650,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 460px;
+    width: 570px;
     height: 42px;
   }
   .newsList li a:hover{
@@ -793,7 +785,7 @@ export default {
   .newsCnt{
     background: url("~@/assets/img/newsbg.jpg") no-repeat left top;
     background-size: 100% 100%;
-    width: 480px;
+    width: 640px;
     height: 247px;
   }
   .quickTil{
