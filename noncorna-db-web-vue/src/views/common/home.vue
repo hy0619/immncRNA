@@ -189,13 +189,15 @@ export default {
   methods: {
     getSvg () {
       const xhr = new XMLHttpRequest()
-      this.svgUrl = '../../../static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
+      this.svgUrl = 'http://119.45.191.10/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
       xhr.open('GET', this.svgUrl, true)
+      console.log(111);
       xhr.send()
 
       xhr.addEventListener('load', () => {
         // ① 获取svg的dom
         const resXML = xhr.responseXML
+        console.log(resXML)
         this.svgDom = resXML.documentElement.cloneNode(true)     // console.log(this.svgDom);
         // ② 添加click事件
         let tags = this.svgDom.querySelectorAll('a')
