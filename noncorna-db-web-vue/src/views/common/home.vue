@@ -185,6 +185,7 @@ export default {
       deep: true
     }
   },
+
   // https://editor.method.ac/#delete
   methods: {
     getSvg () {
