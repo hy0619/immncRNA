@@ -163,7 +163,8 @@ export default {
       immuneCellCnt: 0,
       genCnt: 0,
       cancerTypeCnt: 0,
-      chartPie: null
+      chartPie: null,
+      puTimeChart: null
     }
   },
   computed: {
@@ -198,10 +199,10 @@ export default {
     }, 30)
 
     this.initChartPie()
-    // this.initChartPie2()
-
+    const that = this 
     window.addEventListener("resize",function(){
-        this.initChartPie()
+
+       that.puTimeChart.resize()
     })
   },
   activated () {
@@ -236,7 +237,8 @@ export default {
   methods: {
     getSvg () {
       const xhr = new XMLHttpRequest()
-      this.svgUrl = '../static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
+      console.log( window.SITE_CONFIG['cdnUrl'] + '----------');
+      this.svgUrl =  window.SITE_CONFIG['cdnUrl'] + '/static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
       xhr.open('GET', this.svgUrl, true)
       // x`console.log(111)
       xhr.send()
@@ -310,7 +312,7 @@ export default {
       this.svgDom = null
     },
     takePhoto () {
-      console.log(2222)
+      // console.log(2222)
     },
 
     rotateX (speedX) {
@@ -538,8 +540,8 @@ export default {
           }
 
           option.xAxis.data = xAxisDataArr
-          console.log('------')
-          console.log(option.xAxis.data)
+         // console.log('------')
+          // console.log(option.xAxis.data)
 
           this.$http({
             url: this.$http.adornUrl('/rna/rnainfo/web/getCateGroyNumGroupByPubTime?startYear=' + startYear + '&endYear=' + endYear),
@@ -553,6 +555,8 @@ export default {
               option.series[3].data = data.suvivalList
               // console.log(data.geneIdList)
               pubTime.setOption(option)
+
+              this.puTimeChart = pubTime
             } else {
               this.$message.error(data.msg)
             }
