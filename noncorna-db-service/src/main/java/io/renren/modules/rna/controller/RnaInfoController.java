@@ -352,7 +352,7 @@ public class RnaInfoController {
 
         R ok = R.ok();
 
-        ok.put("geneIdList" , geneIdList);
+        //ok.put("geneIdList" , geneIdList);
         ok.put("tissueOriginList" , tissueOriginList);
         ok.put("cancerTypeList" , cancerTypeList);
         ok.put("geneTypeList" , geneTypeList);
