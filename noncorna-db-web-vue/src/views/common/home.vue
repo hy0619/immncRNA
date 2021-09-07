@@ -232,9 +232,9 @@ export default {
   methods: {
     getSvg () {
       const xhr = new XMLHttpRequest()
-      this.svgUrl = 'http://localhost:8001/static/img/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
+      this.svgUrl = 'http://119.45.191.10/Figure1-4-2.svg' // svg的绝对地址，在浏览器中打开能看到的那个
       xhr.open('GET', this.svgUrl, true)
-      console.log(111)
+      // x`console.log(111)
       xhr.send()
 
       xhr.addEventListener('load', () => {
@@ -518,7 +518,7 @@ export default {
       }
 
       this.$http({
-        url: this.$http.adornUrl('rna/rnainfo/web/getMaxAndMinPubTime'),
+        url: this.$http.adornUrl('/rna/rnainfo/web/getMaxAndMinPubTime'),
         method: 'get'
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -537,7 +537,7 @@ export default {
           console.log(option.xAxis.data)
 
           this.$http({
-            url: this.$http.adornUrl('rna/rnainfo/web/getCateGroyNumGroupByPubTime?startYear=' + startYear + '&endYear=' + endYear),
+            url: this.$http.adornUrl('/rna/rnainfo/web/getCateGroyNumGroupByPubTime?startYear=' + startYear + '&endYear=' + endYear),
             method: 'get'
           }).then(({ data }) => {
             if (data && data.code === 0) {

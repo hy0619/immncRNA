@@ -344,7 +344,7 @@ public class RnaInfoController {
         Integer endYear = Integer.valueOf((String)map.get("endYear"));
 
 
-        List<Integer> geneIdList = this.getNumByPubTime("gene_id", startYear, endYear);
+        //List<Integer> geneIdList = this.getNumByPubTime("gene_id", startYear, endYear);
         List<Integer> tissueOriginList = this.getNumByPubTime("tissue_origin" , startYear , endYear);
         List<Integer> cancerTypeList = this.getNumByPubTime("cancer_type" , startYear , endYear);
         List<Integer> suvivalList = this.getNumByPubTime("suvival" , startYear , endYear);
