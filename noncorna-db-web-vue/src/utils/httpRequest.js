@@ -4,7 +4,10 @@ import router from '@/router'
 import qs from 'qs'
 import merge from 'lodash/merge'
 import { clearLoginInfo } from '@/utils'
+import { Message } from 'element-ui'
+import { showFullScreenLoading,  tryHideFullScreenLoading } from '@/utils/loading'
 
+ var l = null; 
 const http = axios.create({
   timeout: 1000 * 30,
   withCredentials: true,
@@ -18,8 +21,10 @@ const http = axios.create({
  */
 http.interceptors.request.use(config => {
   config.headers['token'] = Vue.cookie.get('token') // 请求头带上token
+  showFullScreenLoading()
   return config
 }, error => {
+  tryHideFullScreenLoading()
   return Promise.reject(error)
 })
 
@@ -27,12 +32,16 @@ http.interceptors.request.use(config => {
  * 响应拦截
  */
 http.interceptors.response.use(response => {
+  tryHideFullScreenLoading()
   if (response.data && response.data.code === 401) { // 401, token失效
     clearLoginInfo()
+    
     router.push({ name: 'login' })
   }
   return response
 }, error => {
+  tryHideFullScreenLoading()
+  
   return Promise.reject(error)
 })
 

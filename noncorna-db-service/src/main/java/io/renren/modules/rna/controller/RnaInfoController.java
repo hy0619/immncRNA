@@ -10,6 +10,7 @@ import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.afterturn.easypoi.handler.inter.IReadHandler;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.CaseFormat;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.ExcelUtils;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 
@@ -343,8 +345,6 @@ public class RnaInfoController {
         Integer startYear = Integer.valueOf((String) map.get("startYear")) ;
         Integer endYear = Integer.valueOf((String)map.get("endYear"));
 
-
-        //List<Integer> geneIdList = this.getNumByPubTime("gene_id", startYear, endYear);
         List<Integer> tissueOriginList = this.getNumByPubTime("tissue_origin" , startYear , endYear);
         List<Integer> cancerTypeList = this.getNumByPubTime("cancer_type" , startYear , endYear);
         List<Integer> suvivalList = this.getNumByPubTime("suvival" , startYear , endYear);
@@ -352,7 +352,6 @@ public class RnaInfoController {
 
         R ok = R.ok();
 
-        //ok.put("geneIdList" , geneIdList);
         ok.put("tissueOriginList" , tissueOriginList);
         ok.put("cancerTypeList" , cancerTypeList);
         ok.put("geneTypeList" , geneTypeList);
@@ -363,37 +362,78 @@ public class RnaInfoController {
 
     }
 
+    private Workbook bigExcel(Map<String, Object> params, ExportParams exportParams) {
 
-    @GetMapping("/web/downloadByCategory")
-    public void downloadByCategory(@RequestParam Map<String, Object> map ,HttpServletResponse response){
-        String column = (String) map.get("column");
-        String value = (String) map.get("value");
-        //Map<String , Object> params = new HashMap<>(2);
-        QueryWrapper<RnaInfoEntity> queryWrapper = new QueryWrapper<>();
-        if(!StringUtils.isEmpty(column) && !StringUtils.isEmpty(value)){
-            queryWrapper.like(column , value);
-        }
-        List list = rnaInfoService.list(queryWrapper);
-        ExcelUtils.exportExcel(list , "LmmRNA DATA"  ,
-                "LmmRNA DATA" , RnaInfoEntity.class ,
-                "LmmRNA DATA" , true, response);
+
+        return ExcelExportUtil.exportBigExcel(exportParams, RnaInfoEntity.class, (queryParams, current) -> {
+            //分页查询数据
+            Page<RnaInfoEntity> pageParam = new Page<>();
+            pageParam.setSize(3000);
+            pageParam.setCurrent(current);
+
+            String column = (String) params.get("column");
+            String value = (String) params.get("value");
+            QueryWrapper queryWrapper = new QueryWrapper<>();
+            queryWrapper.orderByAsc("data_id");
+            if (!StringUtils.isEmpty(column) && !StringUtils.isEmpty(value)) {
+                queryWrapper.eq(column, value);
+            }
+            queryWrapper.eq("status", 0);
+            Page pageRes = rnaInfoService.page(pageParam, queryWrapper);
+            return pageRes.getRecords();
+        }, params);
 
     }
 
-    @GetMapping("/web/downloadByCategory4cvs")
+
+    @GetMapping("/web/downloadByCategory")
+    public void downloadByCategory(@RequestParam Map<String, Object> map ,HttpServletResponse response){
+
+
+        ExportParams exportParams = new ExportParams("LmmncRNA DATA", "LmmncRNA DATA" );
+        exportParams.setCreateHeadRows(true);
+
+        Workbook workbook = bigExcel( map, exportParams);
+
+        try {
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename="
+                    + URLEncoder.encode("LmmncRNA DATA", "UTF-8"));
+            response.setHeader("content-Type", "application/vnd.ms-excel");
+            workbook.write(response.getOutputStream());
+        } catch (IOException e) {
+        }
+
+
+    }
+
+    @GetMapping("/web/downloadByCategory4cvsOrTxt")
     public void downloadByCategory4cvs(@RequestParam Map<String, Object> map ,HttpServletResponse response) throws IOException {
         String column = (String) map.get("column");
         String value = (String) map.get("value");
+
+        String type = (String) map.get("type");
         //Map<String , Object> params = new HashMap<>(2);
         QueryWrapper<RnaInfoEntity> queryWrapper = new QueryWrapper<>();
         if(!StringUtils.isEmpty(column) && !StringUtils.isEmpty(value)){
-            queryWrapper.like(column , value);
+            queryWrapper.eq(column , value);
         }
+        queryWrapper.eq("status" , 0);
         List list = rnaInfoService.list(queryWrapper);
+
+
         CsvExportParams exportParams = new CsvExportParams("utf-8");
-        String fileName = "attachment;filename=download.cvs";
+        exportParams.setSpiltMark("|");
+        String fileName = "attachment;filename=download";
+        if ("csv".equals(type)) {
+            response.setContentType("application/csv");
+        }else{
+            response.setContentType("text/plain");
+        }
+
         response.setHeader("Content-Disposition", new String(fileName.getBytes(), "utf-8"));
-        CsvExportUtil.exportCsv(exportParams , RnaInfoEntity.class , list, response.getOutputStream());
+        CsvExportUtil.exportCsv(exportParams , RnaInfoEntity.class
+                , list,  response.getOutputStream());
 
     }
 

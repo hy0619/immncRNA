@@ -45,7 +45,8 @@
 
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="download(1 , scope.row.category)">excel</el-button>
-                  <el-button type="text" size="small" @click="downloadCvs(1 , scope.row.category)">cvs</el-button>
+                  <el-button type="text" size="small" @click="downloadCvsOrTxt(1 , scope.row.category , 'csv')">csv</el-button>
+                  <el-button type="text" size="small" @click="downloadCvsOrTxt(1 , scope.row.category , 'txt')">txt</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -118,25 +119,42 @@ export default {
         let blob = new Blob([data], {
           type: 'application/vnd.ms-excel'      // 将会被放入到blob中的数组内容的MIME类型
         })
-        let objectUrl = URL.createObjectURL(blob)  // 生成一个url
-        window.location.href = objectUrl   // 浏览器打开这个url
+       let objectUrl = URL.createObjectURL(blob) // 创建URL
+        const link = document.createElement('a')
+        link.href = objectUrl
+        link.download = value + '.xlsx' // 自定义文件名
+        link.click() // 下载文件
+        URL.revokeObjectURL(objectUrl); // 释放内存
       })
     },
-    downloadCvs (downType, value) {
+    downloadCvsOrTxt (downType, value ,type) {
       this.$http({
-        url: this.$http.adornUrl('/rna/rnainfo/web/downloadByCategory4cvs'),
+        url: this.$http.adornUrl('/rna/rnainfo/web/downloadByCategory4cvsOrTxt'),
         method: 'get',
         params: this.$http.adornParams({
           'column': downType === 0 ? '' : this.getColumn(),
+          'type': type,
           'value': value
         }),
         responseType: 'blob'
       }).then(({data}) => {
+        
+        let typeStr 
+        if(type == 'csv'){
+          typeStr = 'application/csv'
+        }else{
+          typeStr = 'text/plain'
+        }
+
         let blob = new Blob([data], {
-          type: 'application/vnd.ms-excel'      // 将会被放入到blob中的数组内容的MIME类型
+          type: typeStr      // 将会被放入到blob中的数组内容的MIME类型
         })
-        let objectUrl = URL.createObjectURL(blob)  // 生成一个url
-        window.location.href = objectUrl   // 浏览器打开这个url
+        let objectUrl = URL.createObjectURL(blob) // 创建URL
+        const link = document.createElement('a')
+        link.href = objectUrl
+        link.download = value + '.' + type // 自定义文件名
+        link.click() // 下载文件
+        URL.revokeObjectURL(objectUrl); // 释放内存
       })
     }
 
