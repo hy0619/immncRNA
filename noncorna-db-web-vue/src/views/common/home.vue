@@ -84,14 +84,14 @@
 <!--          <div class="chart-1 chart-box" id="J_chartPieBox2"></div>-->
 <!--        </div>-->
 
-        <div class="quickSerMain" style="width: 900px;height: 300px;">
-          <div class="chart-2 chart-box" id="J_chartPieBox" style="width: 900px;height: 300px;"></div>
+        <div class="quickSerMain" style="width: 72%;height: 300px;">
+          <div class="chart-2 chart-box" id="J_chartPieBox" style="width: 100%;height: 300px;"></div>
         </div>
       </div>
 
       <div style="overflow: hidden;margin-top: 20px;">
         <!--    news    -->
-        <div class="newsMain" style="width: 600px">
+        <div class="newsMain" style="width:55%;">
           <div class="newsTil">Latest News</div>
           <div class="newsCnt">
             <ul class="newsList">
@@ -106,10 +106,10 @@
         </div>
 
         <!--    searcher    -->
-        <div class="quickSerMain" style="width: 550px">
+        <div class="quickSerMain" style="width:43%;">
           <div class="newsTil">Most Search</div>
 <!--          <div class="quickTil"></div>-->
-          <svg :width="width" :height="height" @mousemove="listener($event)">
+          <svg width="100%" :height="height" @mousemove="listener($event)">
             <a
               :href="tag.href"
               target="_blank"
@@ -199,6 +199,10 @@ export default {
 
     this.initChartPie()
     // this.initChartPie2()
+
+    window.addEventListener("resize",function(){
+
+    })
   },
   activated () {
     this.getWebConfig()
@@ -653,10 +657,12 @@ export default {
 <style scoped>
 .main_right {
   float: right;
-  width: 650px;
+  /* width: 650px; */
+  width: 58%;
 }
 .main_left {
-  width: 520px;
+  /* width: 520px; */
+  width: 40%;
   float: left;
 }
 .welcome_ny {
@@ -711,7 +717,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 570px;
+  width: 100%;
   height: 42px;
 }
 .newsList li a:hover {
@@ -750,10 +756,12 @@ export default {
   width: 100%;
   height: 350px;
   background: url("~@/assets/img/banner.jpg") no-repeat center center;
+  background-size: 100% auto;
   position: relative;
 }
 .index_main {
-  width: 1200px;
+  /* width: 1200px; */
+  width: 80%;
   margin: 0 auto;
   padding-top: 35px;
 }
@@ -820,7 +828,8 @@ export default {
   margin-top: 20px;
 }
 .statisticsMain {
-  width: 275px;
+  /* width: 275px; */
+  width: 25%;
   float: left;
   height: 307px;
 }
@@ -847,7 +856,7 @@ export default {
 .newsCnt {
   background: url("~@/assets/img/newsbg.jpg") no-repeat left top;
   background-size: 100% 100%;
-  width: 640px;
+  width: 100%;
   height: 247px;
 }
 .quickTil {
@@ -858,7 +867,8 @@ export default {
 }
 .statistBox {
   border-radius: 36px;
-  width: 270px;
+  /* width: 270px; */
+  width: 100%;
   height: 58px;
   color: #ffffff;
   margin-top: 24px;
