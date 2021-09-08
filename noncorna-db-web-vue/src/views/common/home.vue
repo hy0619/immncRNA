@@ -202,12 +202,14 @@ export default {
     const that = this 
     window.addEventListener("resize",function(){
       console.log(333);
-
        that.puTimeChart.resize()
+      // var bbox =  that.svgDom.getBBox();
+      //  that.svgDom.setAttribute("width", bbox.x + bbox.width  + "px");
+      //  that.svgDom.setAttribute("height",bbox.y + bbox.height + "px");
 
-      // console.log( that.svgDom)
-
-       that.svgDom.setAttribute('viewBox', '0,0,' + that.svgDom.getBBox().width + ',' + that.svgDom.getBBox().height + '')
+       that.adjustToFreezeWidth(that.svgDom)
+       //that.svgDom.setAttribute('viewBox', '0,0,' + that.svgDom.getBBox().width + ',' + that.svgDom.getBBox().height + '')
+      // console.log( bbox)
     })
   },
   activated () {
@@ -240,6 +242,31 @@ export default {
 
   // https://editor.method.ac/#delete
   methods: {
+
+    adjustToFreezeWidth(rootSvg) {
+        var windowWidth =  document.body.clientWidth;
+    
+        var viewBoxVal = rootSvg.getAttribute("viewBox");
+        var viewBoxWidth = viewBoxVal.split(" ")[2];
+        var viewBoxHeight = viewBoxVal.split(" ")[3];
+
+        console.log('===========viewBoxVal====================')
+         console.log(viewBoxVal)
+        rootSvg.removeAttribute("width");
+        rootSvg.removeAttribute("height");
+
+        var setWidth = windowWidth;
+
+        console.log('==================setWidth=============')
+         console.log(setWidth)
+        var setHeight = (setWidth * viewBoxHeight) / viewBoxWidth;
+      
+        
+        rootSvg.setAttribute("width", setWidth);
+        rootSvg.setAttribute("height", setHeight);
+
+        console.log(rootSvg)
+    },
     getSvg () {
       const xhr = new XMLHttpRequest()
       //console.log( window.SITE_CONFIG['cdnUrl'] + '----------');
